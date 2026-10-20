@@ -1,0 +1,32 @@
+name: Build EXE
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build EXE
+        run: >
+          pyinstaller --noconfirm --onefile --windowed
+          --name HardwareStudio
+          --collect-all customtkinter
+          --add-data "firmware;firmware"
+          app.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HardwareStudio-exe
+          path: dist/HardwareStudio.exe
